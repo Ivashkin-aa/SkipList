@@ -1,48 +1,85 @@
-class SKipList {
-    private var inf: Int = 0
-    private var head: SkipNode? = null
-    private var bottom: SkipNode? = null
-    private var tail: SkipNode? = null
+import kotlin.random.Random
 
-    constructor(inf: Int) {
-        this.inf = inf
-        bottom = SkipNode(0)
-        bottom!!.right = bottom
-        bottom!!.down = bottom
-        tail = SkipNode(inf)
-        tail!!.right = tail
-        head = SkipNode(inf, tail!!, bottom!!)
+class SKipList {
+    private var head = SkipNode(0, 33)
+    private var levels = 1
+
+    fun add(value: Int) {
+        var level = 0
+        var random = Random.nextInt()
+        while (random and 1 == 1) {
+            level++
+            if (level == levels) {
+                levels++
+                break
+            }
+            random = random shr 1
+        }
+        val node = SkipNode(value, level + 1)
+        var cur = head
+        for (i in levels - 1 downTo 0) {
+            while (cur.next[i] != null) {
+                if (cur.next[i]!!.value > value) {
+                    break
+                }
+                cur = cur.next[i]!!
+            }
+            if (i <= level) {
+                node.next[i] = cur.next[i]
+                cur.next[i] = node
+            }
+        }
+
     }
 
-    fun add(x: Int) {
-        var current = head
-        bottom?.element = x
-        while (current != bottom) {
-            while (current?.element!! < x)
-                current = current.right
-            if (current.down?.right?.right?.element!! < current.element) {
-                current.right = SkipNode(current.element, current.right!!, current.down?.right?.right!!)
-                current.element = current.down?.right?.element!!
-            } else
-                current = current.down
+    fun addAll(collection: Collection<Int>) {
+        for (element in collection)
+            add(element)
+    }
+
+    fun contains(value: Int): Boolean {
+        var cur = head
+        for (i in levels - 1 downTo 0) {
+            while (cur.next[i] != null) {
+                if (cur.next[i]?.value == value)
+                    return true
+                if (cur.next[i]?.value!! > value)
+                    break
+                cur = cur.next[i]!!
+            }
         }
-        if (head?.right != tail)
-            head = SkipNode(inf, tail!!, head!!)
+        return false
     }
 
     fun isEmpty(): Boolean {
-        return head!!.right == tail && head!!.down == bottom
+        return head.next[0] == null
+    }
+
+    fun remove(value: Int) {
+        var cur = head
+        for (i in levels - 1 downTo 0) {
+            while (cur.next[i] != null) {
+                if (cur.next[i]?.value == value) {
+                    cur.next[i] = cur.next[i]?.next?.get(i)
+                    break
+                }
+                if (cur.next[i]?.value!! > value)
+                    break
+                cur = cur.next[i]!!
+            }
+        }
     }
 
     fun printSkipList() {
-        println("SkipList= ")
-        var current = head
-        while (current?.down != bottom)
-            current = current?.down
-        while (current?.right != tail) {
-            print(current!!.element)
-            print(" ")
-            current = current.right
+        println("SkipList:")
+        for (i in levels - 1 downTo 0) {
+            var cur = head
+            while (cur.next[i] != null) {
+                print(cur.next[i]?.value)
+                print(" ")
+                cur = cur.next[i]!!
+            }
+            println()
         }
     }
 }
