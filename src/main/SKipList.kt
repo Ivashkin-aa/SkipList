@@ -70,6 +70,16 @@ class SKipList {
         }
     }
 
+    fun levelSize(level: Int): Int {
+        var cur = head
+        var size = 0
+        while (cur.next[level] != null) {
+            size++
+            cur = cur.next[level]!!
+        }
+        return size
+    }
+
     fun printSkipList() {
         println("SkipList:")
         for (i in levels - 1 downTo 0) {

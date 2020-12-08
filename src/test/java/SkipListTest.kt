@@ -40,5 +40,14 @@ class SkipListTest {
         test.printSkipList()
     }
 
+    @Test
+    fun size() {
+        val test = SKipList()
+        test.addAll(setOf(17,22,24,48,51,69,19))
+        test.printSkipList()
+        println(test.levelSize(1))
+        println(test.levelSize(10))
+    }
+
 }
 
