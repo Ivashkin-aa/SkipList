@@ -1,3 +1,3 @@
-class SkipNode(var value: Int, level: Int) {
-    var next: Array<SkipNode?> = arrayOfNulls(level)
+class SkipNode<T:Comparable<T>>(var value: T?, level: Int) {
+    var next: Array<SkipNode<T>?> = arrayOfNulls(level)
 }

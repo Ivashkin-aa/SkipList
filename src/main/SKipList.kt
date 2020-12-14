@@ -1,14 +1,14 @@
 import java.util.*
 import kotlin.random.Random
 
-class SKipList : SortedSet<Int> {
-    private var head = SkipNode(0, 33)
+class SKipList<T : Comparable<T>> : SortedSet<T> {
+    private var head = SkipNode<T>(null, 33)
     private var levels = 1
 
     override val size: Int
         get() = sizeForAllLevel()
 
-    override fun add(element: Int): Boolean {
+    override fun add(element: T): Boolean {
         var level = 0
         var random = Random.nextInt()
         while (random and 1 == 1) {
@@ -23,7 +23,7 @@ class SKipList : SortedSet<Int> {
         var cur = head
         for (i in levels - 1 downTo 0) {
             while (cur.next[i] != null) {
-                if (cur.next[i]!!.value > element) {
+                if (cur.next[i]!!.value!! > element) {
                     break
                 }
                 cur = cur.next[i]!!
@@ -36,13 +36,13 @@ class SKipList : SortedSet<Int> {
         return true
     }
 
-    override fun addAll(elements: Collection<Int>): Boolean {
+    override fun addAll(elements: Collection<T>): Boolean {
         for (element in elements)
             add(element)
         return true
     }
 
-    override fun contains(element: Int): Boolean {
+    override fun contains(element: T): Boolean {
         var cur = head
         for (i in levels - 1 downTo 0) {
             while (cur.next[i] != null) {
@@ -56,7 +56,7 @@ class SKipList : SortedSet<Int> {
         return false
     }
 
-    override fun containsAll(elements: Collection<Int>): Boolean {
+    override fun containsAll(elements: Collection<T>): Boolean {
         for (element in elements)
             if (!contains(element))
                 return false
@@ -67,7 +67,7 @@ class SKipList : SortedSet<Int> {
         return head.next[0] == null
     }
 
-    override fun remove(element: Int): Boolean {
+    override fun remove(element: T): Boolean {
         var cur = head
         var found = false
         for (i in levels - 1 downTo 0) {
@@ -85,14 +85,14 @@ class SKipList : SortedSet<Int> {
         return found
     }
 
-    override fun removeAll(elements: Collection<Int>): Boolean {
+    override fun removeAll(elements: Collection<T>): Boolean {
         for (element in elements)
             if (!remove(element))
                 return false
         return true
     }
 
-    override fun retainAll(elements: Collection<Int>): Boolean {
+    override fun retainAll(elements: Collection<T>): Boolean {
         for (i in levels - 1 downTo 0) {
             var cur = head
             while (cur.next[i] != null) {
@@ -140,56 +140,81 @@ class SKipList : SortedSet<Int> {
         return size
     }
 
-    override fun first(): Int? {
+    override fun first(): T? {
         return head.next[0]?.value
     }
 
-    override fun last(): Int? {
+    override fun last(): T? {
         var cur = head
         while (cur.next[0]?.next?.get(0) != null)
             cur = cur.next[0]!!
         return cur.next[0]?.value
     }
 
-    override fun tailSet(fromElement: Int): SKipList {
-        val sl = SKipList()
+    override fun tailSet(fromElement: T): SKipList<T> {
+        val sl = SKipList<T>()
         var cur = head
         while (cur.next[0] != null) {
-            if (cur.next[0]!!.value > fromElement)
-                sl.add(cur.next[0]!!.value)
+            if (cur.next[0]!!.value!! > fromElement)
+                sl.add(cur.next[0]!!.value!!)
             cur = cur.next[0]!!
         }
         return sl
     }
 
-    override fun headSet(toElement: Int): SKipList {
-        val sl = SKipList()
+    override fun headSet(toElement: T): SKipList<T> {
+        val sl = SKipList<T>()
         var cur = head
         while (cur.next[0] != null) {
-            if (cur.next[0]!!.value < toElement)
-                sl.add(cur.next[0]!!.value)
+            if (cur.next[0]!!.value!! < toElement)
+                sl.add(cur.next[0]!!.value!!)
             cur = cur.next[0]!!
         }
         return sl
     }
 
-    override fun subSet(fromElement: Int, toElement: Int): SKipList {
-        val sl = SKipList()
+    override fun subSet(fromElement: T, toElement: T): SKipList<T> {
+        val sl = SKipList<T>()
         var cur = head
+        //sl.addAll(headSet(toElement).intersect(tailSet(fromElement)))
         while (cur.next[0] != null) {
-            if (cur.next[0]!!.value in (fromElement + 1) until toElement)
-                sl.add(cur.next[0]!!.value)
+            if ((cur.next[0]!!.value!! < toElement) && (cur.next[0]!!.value!! > fromElement))
+                sl.add(cur.next[0]!!.value!!)
             cur = cur.next[0]!!
         }
         return sl
     }
 
-    override fun iterator(): MutableIterator<Int> {
-        TODO("Not yet implemented")
+    override fun iterator(): MutableIterator<T> = object : MutableIterator<T> {
+        var cur = head
+        var i = levels - 1
+
+        override fun hasNext(): Boolean {
+            return i >= 0 && cur.next[i] != null
+        }
+
+        override fun next(): T {
+            if (!hasNext())
+                throw NoSuchElementException()
+            return cur.next[i]!!.value!!.also {
+                cur = cur.next[i]!!
+                if (cur.next[i] == null) {
+                    cur = head
+                    i--
+                }
+            }
+        }
+
+        override fun remove() {
+            remove(cur.value)
+        }
+
     }
 
-    override fun comparator(): Comparator<in Int>? {
-        TODO("Not yet implemented")
+    override fun comparator(): Comparator<in T>? = Comparator { o1, o2 ->
+        if (o1 == null || o2 == null)
+            throw NullPointerException()
+        o1.compareTo(o2)
     }
 
     fun printSkipList() {
