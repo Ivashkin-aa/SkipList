@@ -87,8 +87,7 @@ class SKipList<T : Comparable<T>> : SortedSet<T> {
 
     override fun removeAll(elements: Collection<T>): Boolean {
         for (element in elements)
-            if (!remove(element))
-                return false
+            remove(element)
         return true
     }
 
@@ -175,13 +174,7 @@ class SKipList<T : Comparable<T>> : SortedSet<T> {
 
     override fun subSet(fromElement: T, toElement: T): SKipList<T> {
         val sl = SKipList<T>()
-        var cur = head
-        //sl.addAll(headSet(toElement).intersect(tailSet(fromElement)))
-        while (cur.next[0] != null) {
-            if ((cur.next[0]!!.value!! < toElement) && (cur.next[0]!!.value!! > fromElement))
-                sl.add(cur.next[0]!!.value!!)
-            cur = cur.next[0]!!
-        }
+        sl.addAll(headSet(toElement).intersect(tailSet(fromElement)))
         return sl
     }
 

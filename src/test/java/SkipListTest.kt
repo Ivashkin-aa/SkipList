@@ -10,6 +10,7 @@ class SkipListTest {
         test.add(2)
         test.add(4)
         test.addAll(listOf(49, 54, 22, 5))
+        assertEquals(7,test.levelSize(0))
         test.printSkipList()
     }
 
@@ -38,7 +39,9 @@ class SkipListTest {
         test.printSkipList()
         println("------")
         test.remove(65)
+        assertEquals(7,test.levelSize(0))
         test.removeAll(listOf(9, 21, 8898))
+        assertEquals(5,test.levelSize(0))
         test.printSkipList()
     }
 
@@ -75,10 +78,13 @@ class SkipListTest {
         val test = SKipList<Int>()
         test.addAll(setOf(12, 42, 55, 12, 222, 36))
         test.tailSet(40).printSkipList()
+        assertEquals(3,test.tailSet(40).levelSize(0))
         println("-----")
         test.headSet(55).printSkipList()
+        assertEquals(2,test.headSet(40).levelSize(0))
         println("-----")
         test.subSet(20, 100).printSkipList()
+        assertEquals(3,test.subSet(20,100).levelSize(0))
     }
 
     @Test
@@ -88,6 +94,7 @@ class SkipListTest {
         test.printSkipList()
         println("-----")
         test.retainAll(setOf(124, 5, 675, 1))
+        assertEquals(4,test.levelSize(0))
         test.printSkipList()
     }
 
